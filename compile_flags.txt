@@ -3,6 +3,7 @@
 -fuse-ld=lld
 -O3
 -Qunused-arguments
--std=c99
+-std=c89
 -Werror
 -Weverything
+-Wno-unsafe-buffer-usage
