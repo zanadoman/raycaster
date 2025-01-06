@@ -1,0 +1,4 @@
+BasedOnStyle: Chromium
+IndentWidth: 4
+QualifierAlignment: Custom
+QualifierOrder: [friend, inline, static, constexpr, const, volatile, restrict, type]
