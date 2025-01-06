@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL_stdinc.h>
 
-#define PIf ((float)3.14159265358979323846f)
+#define PIf ((float)3.14159265358979323846F)
 
 #define PLAYER_MOVEMENT_SPEED ((float)0.005)
 #define PLAYER_ROTATION_SPEED ((float)0.005)

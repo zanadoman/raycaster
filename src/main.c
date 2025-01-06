@@ -6,11 +6,11 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_log.h>
+#include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_video.h>
 
-#include <stdbool.h>
 #include <stdlib.h>
 
 Sint32 main(void) {
@@ -37,10 +37,14 @@ Sint32 main(void) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
     }
+    if (SDL_SetRelativeMouseMode(SDL_TRUE)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
 
     PlayerInitialize(&player);
 
-    while (true) {
+    while (SDL_TRUE) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 exit(0);

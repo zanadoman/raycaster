@@ -10,9 +10,9 @@
 #include <stdlib.h>
 
 void PlayerInitialize(Player* self) {
-    self->x = 0;
-    self->y = 0;
-    self->direction = 0;
+    self->x = 3;
+    self->y = 3;
+    self->angle = 0;
 }
 
 void PlayerUpdate(Player* self) {
@@ -20,32 +20,32 @@ void PlayerUpdate(Player* self) {
     Sint32 x = 0;
 
     if (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_S]) {
-        self->x += PLAYER_MOVEMENT_SPEED * SDL_cosf(self->direction) *
-                   TimerGetDeltaTime();
-        self->y += PLAYER_MOVEMENT_SPEED * SDL_sinf(self->direction) *
-                   TimerGetDeltaTime();
+        self->x +=
+            PLAYER_MOVEMENT_SPEED * SDL_cosf(self->angle) * TimerGetDeltaTime();
+        self->y +=
+            PLAYER_MOVEMENT_SPEED * SDL_sinf(self->angle) * TimerGetDeltaTime();
     } else if (keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_W]) {
-        self->x -= PLAYER_MOVEMENT_SPEED * SDL_cosf(self->direction) *
-                   TimerGetDeltaTime();
-        self->y -= PLAYER_MOVEMENT_SPEED * SDL_sinf(self->direction) *
-                   TimerGetDeltaTime();
+        self->x -=
+            PLAYER_MOVEMENT_SPEED * SDL_cosf(self->angle) * TimerGetDeltaTime();
+        self->y -=
+            PLAYER_MOVEMENT_SPEED * SDL_sinf(self->angle) * TimerGetDeltaTime();
     }
     if (keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_D]) {
         self->x -= PLAYER_MOVEMENT_SPEED *
-                   SDL_cosf(self->direction + (PIf / 180 * 90)) *
+                   SDL_cosf(self->angle + (PIf / 180 * 90)) *
                    TimerGetDeltaTime();
         self->y -= PLAYER_MOVEMENT_SPEED *
-                   SDL_sinf(self->direction + (PIf / 180 * 90)) *
+                   SDL_sinf(self->angle + (PIf / 180 * 90)) *
                    TimerGetDeltaTime();
     } else if (keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A]) {
         self->x += PLAYER_MOVEMENT_SPEED *
-                   SDL_cosf(self->direction + (PIf / 180 * 90)) *
+                   SDL_cosf(self->angle + (PIf / 180 * 90)) *
                    TimerGetDeltaTime();
         self->y += PLAYER_MOVEMENT_SPEED *
-                   SDL_sinf(self->direction + (PIf / 180 * 90)) *
+                   SDL_sinf(self->angle + (PIf / 180 * 90)) *
                    TimerGetDeltaTime();
     }
 
     SDL_GetRelativeMouseState(&x, NULL);
-    self->direction += PLAYER_ROTATION_SPEED * (float)x;
+    self->angle += PLAYER_ROTATION_SPEED * (float)x;
 }

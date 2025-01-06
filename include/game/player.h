@@ -6,7 +6,7 @@ typedef struct Player Player;
 struct Player {
     float x;
     float y;
-    float direction;
+    float angle;
 };
 
 void PlayerInitialize(Player* self);
