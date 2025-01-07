@@ -17,7 +17,7 @@ void PlayerInitialize(Player* self) {
 
 void PlayerUpdate(Player* self) {
     const Uint8* keys = SDL_GetKeyboardState(NULL);
-    Sint32 x = 0;
+    Sint32 x;
 
     if (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_S]) {
         self->x +=

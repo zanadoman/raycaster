@@ -12,7 +12,7 @@ float TimerGetDeltaTime(void) {
 }
 
 void TimerUpdate(void) {
-    Uint64 end = LAST_TIME + TIMER_MINIMUM_FRAME_TIME;
+    const Uint64 end = LAST_TIME + TIMER_MINIMUM_FRAME_TIME;
     Uint64 now = SDL_GetTicks64();
 
     if (now < end) {
