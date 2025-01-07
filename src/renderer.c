@@ -1,6 +1,8 @@
 #include "../include/game/renderer.h"
+#include "../include/game/assets.h"
 #include "../include/game/configuration.h"
 #include "../include/game/player.h"
+#include "../include/game/window.h"
 
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_log.h>
@@ -8,7 +10,6 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_video.h>
 
 #include <float.h>
 #include <stdlib.h>
@@ -17,19 +18,19 @@
 #define ANGLE_STEP (1.0F / WINDOW_WIDTH * PLAYER_FIELD_OF_VIEW)
 #define WINDOW_RATIO ((float)WINDOW_WIDTH / WINDOW_HEIGHT)
 
-static Uint8 MAP[9][9] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 0, 1, 1, 0, 1},
-    {1, 0, 0, 0, 0, 1, 1, 0, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1}};
+static Sint8 MAP[9][9] = {
+    {1, 0, 1, 2, 1, 0, 2, 1, 1},        {1, -1, -1, -1, -1, -1, -1, -1, 2},
+    {0, -1, -1, -1, -1, -1, -1, -1, 0}, {2, -1, -1, -1, -1, -1, -1, -1, 1},
+    {1, -1, -1, -1, -1, -1, -1, -1, 2}, {0, -1, -1, -1, -1, 1, 2, -1, 0},
+    {1, -1, -1, -1, -1, 0, 1, -1, 1},   {0, -1, -1, -1, -1, -1, -1, -1, 0},
+    {1, 1, 2, 1, 2, 1, 0, 1, 0}};
 
 static SDL_Renderer* RENDERER;
 static SDL_Texture* SPATIAL_TARGET;
 
-void RendererInitialize(SDL_Window* window) {
+void RendererInitialize(void) {
     RENDERER = SDL_CreateRenderer(
-        window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+        WindowGet(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     if (!RENDERER) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
@@ -60,9 +61,8 @@ void RendererRenderSpatialSpace(const Player* player) {
     const float initialAngle = player->angle - PLAYER_HALF_FIELD_OF_VIEW;
 
     Sint32 column;
-    SDL_Rect rectangle;
-
-    rectangle.w = 1;
+    SDL_Rect source;
+    SDL_Rect destination;
 
     if (SDL_SetRenderTarget(RENDERER, SPATIAL_TARGET)) {
         SDL_Log("%s\n", SDL_GetError());
@@ -76,6 +76,10 @@ void RendererRenderSpatialSpace(const Player* player) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
     }
+
+    source.y = 0;
+    source.w = 1;
+    destination.w = 1;
 
     for (column = 0; column != WINDOW_WIDTH; ++column) {
         const float rayAngle = initialAngle + (ANGLE_STEP * (float)column);
@@ -94,6 +98,9 @@ void RendererRenderSpatialSpace(const Player* player) {
         Sint8 stepY;
         SDL_bool side;
         float rayLength;
+        SDL_Texture* texture;
+        Sint32 textureWidth;
+        float textureX;
 
         if (rayDirectionX < 0) {
             stepX = -1;
@@ -102,7 +109,6 @@ void RendererRenderSpatialSpace(const Player* player) {
             stepX = 1;
             sideX = ((float)rayX + 1 - player->x) * deltaX;
         }
-
         if (rayDirectionY < 0) {
             stepY = -1;
             sideY = (player->y - (float)rayY) * deltaY;
@@ -120,21 +126,34 @@ void RendererRenderSpatialSpace(const Player* player) {
                 sideY += deltaY;
                 rayY += stepY;
             }
-            if (MAP[rayX][rayY]) {
+            if (0 <= MAP[rayX][rayY]) {
                 break;
             }
         }
 
         rayLength = side ? sideX - deltaX : sideY - deltaY;
-        rayLength *= SDL_cosf(rayAngle - player->angle);
-        rectangle.x = column;
-        rectangle.h = (Sint32)(WINDOW_HEIGHT * WINDOW_RATIO / rayLength);
-        rectangle.y = (WINDOW_HEIGHT - rectangle.h) / 2;
-        if (SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 255)) {
+        texture = AssetsGetWallTextures()[(Uint8)MAP[rayX][rayY] %
+                                          ASSETS_WALL_TEXTURES_COUNT];
+
+        if (SDL_QueryTexture(texture, NULL, NULL, &textureWidth, &source.h)) {
             SDL_Log("%s\n", SDL_GetError());
             exit(1);
         }
-        if (SDL_RenderFillRect(RENDERER, &rectangle)) {
+        textureX = side ? player->y + (rayDirectionY * rayLength)
+                        : player->x + (rayDirectionX * rayLength);
+        textureX -= (float)(Sint32)textureX;
+        source.x = (Sint32)(textureX * (float)textureWidth);
+        if ((side && rayDirectionX < 0) || (!side && 0 < rayDirectionY)) {
+            source.x = textureWidth - 1 - source.x;
+        }
+
+        destination.x = column;
+        destination.h =
+            (Sint32)(WINDOW_HEIGHT * WINDOW_RATIO /
+                     (rayLength * SDL_cosf(rayAngle - player->angle)));
+        destination.y = (WINDOW_HEIGHT - destination.h) / 2;
+
+        if (SDL_RenderCopy(RENDERER, texture, &source, &destination)) {
             SDL_Log("%s\n", SDL_GetError());
             exit(1);
         }

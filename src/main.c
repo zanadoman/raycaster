@@ -1,3 +1,4 @@
+#include "../include/game/assets.h"
 #include "../include/game/player.h"
 #include "../include/game/renderer.h"
 #include "../include/game/timer.h"
@@ -38,7 +39,8 @@ Sint32 main(void) {
     }
 
     WindowInitialize();
-    RendererInitialize(WindowGet());
+    RendererInitialize();
+    AssetsInitialize();
     PlayerInitialize(&player);
 
     while (IsRunning()) {
@@ -50,6 +52,7 @@ Sint32 main(void) {
         TimerUpdate();
     }
 
+    AssetsDestroy();
     RendererDestroy();
     WindowDestroy();
     SDL_Quit();

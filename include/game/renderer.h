@@ -4,9 +4,8 @@
 #include "player.h"
 
 #include <SDL2/SDL_render.h>
-#include <SDL2/SDL_video.h>
 
-void RendererInitialize(SDL_Window* window);
+void RendererInitialize(void);
 
 void RendererDestroy(void);
 
