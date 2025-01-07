@@ -1,4 +1,4 @@
-#include "../include/game/render.h"
+#include "../include/game/renderer.h"
 #include "../include/game/configuration.h"
 #include "../include/game/player.h"
 
@@ -7,6 +7,7 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_video.h>
 
 #include <float.h>
 #include <stdlib.h>
@@ -22,7 +23,29 @@ static Uint8 MAP[9][9] = {
     {1, 0, 0, 0, 0, 1, 1, 0, 1}, {1, 0, 0, 0, 0, 0, 0, 0, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
-void RenderSpatialSpace(SDL_Renderer* renderer, const Player* player) {
+static SDL_Renderer* RENDERER;
+
+void RendererInitialize(SDL_Window* window) {
+    RENDERER = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!RENDERER) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_RenderSetLogicalSize(RENDERER, WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+}
+
+void RendererDestroy(void) {
+    SDL_DestroyRenderer(RENDERER);
+}
+
+SDL_Renderer* RendererGet(void) {
+    return RENDERER;
+}
+
+void RendererRenderSpatialSpace(const Player* player) {
     const float initialAngle = player->angle - PLAYER_HALF_FIELD_OF_VIEW;
 
     Sint32 column;
@@ -83,11 +106,11 @@ void RenderSpatialSpace(SDL_Renderer* renderer, const Player* player) {
         rectangle.x = column;
         rectangle.h = (Sint32)(WINDOW_HEIGHT * WINDOW_RATIO / rayLength);
         rectangle.y = (WINDOW_HEIGHT - rectangle.h) / 2;
-        if (SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255)) {
+        if (SDL_SetRenderDrawColor(RENDERER, 255, 255, 255, 255)) {
             SDL_Log("%s\n", SDL_GetError());
             exit(1);
         }
-        if (SDL_RenderFillRect(renderer, &rectangle)) {
+        if (SDL_RenderFillRect(RENDERER, &rectangle)) {
             SDL_Log("%s\n", SDL_GetError());
             exit(1);
         }
