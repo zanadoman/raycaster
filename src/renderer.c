@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_log.h>
+#include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
@@ -24,9 +25,11 @@ static Uint8 MAP[9][9] = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
 static SDL_Renderer* RENDERER;
+static SDL_Texture* SPATIAL_TARGET;
 
 void RendererInitialize(SDL_Window* window) {
-    RENDERER = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    RENDERER = SDL_CreateRenderer(
+        window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     if (!RENDERER) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
@@ -35,9 +38,17 @@ void RendererInitialize(SDL_Window* window) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
     }
+    SPATIAL_TARGET = SDL_CreateTexture(RENDERER, SDL_PIXELFORMAT_RGBA8888,
+                                       SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH,
+                                       WINDOW_HEIGHT);
+    if (!SPATIAL_TARGET) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
 }
 
 void RendererDestroy(void) {
+    SDL_DestroyTexture(SPATIAL_TARGET);
     SDL_DestroyRenderer(RENDERER);
 }
 
@@ -52,6 +63,19 @@ void RendererRenderSpatialSpace(const Player* player) {
     SDL_Rect rectangle;
 
     rectangle.w = 1;
+
+    if (SDL_SetRenderTarget(RENDERER, SPATIAL_TARGET)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_RenderClear(RENDERER)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
 
     for (column = 0; column != WINDOW_WIDTH; ++column) {
         const float rayAngle = initialAngle + (ANGLE_STEP * (float)column);
@@ -115,4 +139,27 @@ void RendererRenderSpatialSpace(const Player* player) {
             exit(1);
         }
     }
+}
+
+void RendererPresentFrame(void) {
+    const SDL_Rect spatialFrame = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+
+    if (SDL_SetRenderTarget(RENDERER, NULL)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_RenderClear(RENDERER)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_RenderCopyEx(RENDERER, SPATIAL_TARGET, NULL, &spatialFrame, 0, NULL,
+                         SDL_FLIP_NONE)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    SDL_RenderPresent(RENDERER);
 }

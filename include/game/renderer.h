@@ -14,4 +14,6 @@ SDL_Renderer* RendererGet(void);
 
 void RendererRenderSpatialSpace(const Player* player);
 
+void RendererPresentFrame(void);
+
 #endif
