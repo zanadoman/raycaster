@@ -1,5 +1,6 @@
 #include "../include/game/configuration.h"
 #include "../include/game/player.h"
+#include "../include/game/render.h"
 #include "../include/game/timer.h"
 
 #include <SDL2/SDL.h>
@@ -33,10 +34,6 @@ Sint32 main(void) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
     }
-    if (SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255)) {
-        SDL_Log("%s\n", SDL_GetError());
-        exit(1);
-    }
     if (SDL_SetRelativeMouseMode(SDL_TRUE)) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
@@ -54,7 +51,12 @@ Sint32 main(void) {
         PlayerUpdate(&player);
         SDL_Log("%f, %f\n", (double)player.x, (double)player.y);
 
+        if (SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255)) {
+            SDL_Log("%s\n", SDL_GetError());
+            exit(1);
+        }
         SDL_RenderClear(renderer);
+        RenderSpatialSpace(renderer, &player);
         SDL_RenderPresent(renderer);
 
         TimerUpdate();

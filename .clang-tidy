@@ -63,6 +63,7 @@ Checks: >
   portability-*,
   readability-*,
   -bugprone-easily-swappable-parameters,
+  -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-magic-numbers
 FormatStyle: 'file'
