@@ -26,7 +26,7 @@ SDL_bool IsRunning(void) {
     return SDL_TRUE;
 }
 
-Sint32 main(void) {
+Sint32 main([[maybe_unused]] Sint32 argc, [[maybe_unused]] char* argv[]) {
     Player player;
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO)) {

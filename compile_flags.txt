@@ -6,4 +6,5 @@
 -std=c89
 -Werror
 -Weverything
+-Wno-c23-extensions
 -Wno-unsafe-buffer-usage
