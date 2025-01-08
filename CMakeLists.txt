@@ -32,7 +32,7 @@ file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.c)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Libraries
-target_link_libraries(${PROJECT_NAME} SDL2 SDL2_image SDL2_mixer SDL2_ttf)
+target_link_libraries(${PROJECT_NAME} SDL2 SDL2main SDL2_image SDL2_mixer SDL2_ttf)
 
 # Linker
 if(${CMAKE_SYSTEM_NAME} STREQUAL Windows)
