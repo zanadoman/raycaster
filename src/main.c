@@ -8,6 +8,7 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_log.h>
+#include <SDL2/SDL_main.h> /* IWYU pragma: keep */
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_stdinc.h>
 
