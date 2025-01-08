@@ -5,7 +5,7 @@
 
 void WindowInitialize(void);
 
-SDL_Window* WindowGet(void);
+SDL_Window* WindowGetContext(void);
 
 void WindowDestroy(void);
 

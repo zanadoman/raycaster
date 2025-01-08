@@ -9,7 +9,7 @@ void RendererInitialize(void);
 
 void RendererDestroy(void);
 
-SDL_Renderer* RendererGet(void);
+SDL_Renderer* RendererGetContext(void);
 
 void RendererRenderSpatialSpace(const Player* player);
 

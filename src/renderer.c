@@ -30,7 +30,8 @@ static SDL_Texture* SPATIAL_TARGET;
 
 void RendererInitialize(void) {
     RENDERER = SDL_CreateRenderer(
-        WindowGet(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+        WindowGetContext(), -1,
+        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     if (!RENDERER) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
@@ -53,7 +54,7 @@ void RendererDestroy(void) {
     SDL_DestroyRenderer(RENDERER);
 }
 
-SDL_Renderer* RendererGet(void) {
+SDL_Renderer* RendererGetContext(void) {
     return RENDERER;
 }
 

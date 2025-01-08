@@ -32,7 +32,7 @@ void AssetsDestroy(void) {
 SDL_Texture* LoadTexture(const char* path) {
     SDL_Texture* texture;
 
-    texture = IMG_LoadTexture(RendererGet(), path);
+    texture = IMG_LoadTexture(RendererGetContext(), path);
     if (!texture) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
