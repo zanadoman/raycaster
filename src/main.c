@@ -58,4 +58,6 @@ Sint32 main([[maybe_unused]] Sint32 argc, [[maybe_unused]] char* argv[]) {
     RendererDestroy();
     WindowDestroy();
     SDL_Quit();
+
+    return 0;
 }
