@@ -12,7 +12,7 @@ static SDL_Window* WINDOW;
 void WindowInitialize(void) {
     WINDOW = SDL_CreateWindow(
         "Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH,
-        WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED);
+        WINDOW_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_RESIZABLE);
     if (!WINDOW) {
         SDL_Log("%s\n", SDL_GetError());
         exit(1);
