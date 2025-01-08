@@ -7,6 +7,11 @@
 static Uint64 LAST_TIME;
 static float DELTA_TIME;
 
+void TimerInitialize(void) {
+    LAST_TIME = SDL_GetTicks64();
+    DELTA_TIME = 0;
+}
+
 float TimerGetDeltaTime(void) {
     return DELTA_TIME;
 }

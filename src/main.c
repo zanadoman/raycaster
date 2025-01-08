@@ -41,6 +41,7 @@ Sint32 main(void) {
     WindowInitialize();
     RendererInitialize();
     AssetsInitialize();
+    TimerInitialize();
     PlayerInitialize(&player);
 
     while (IsRunning()) {

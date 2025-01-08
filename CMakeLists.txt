@@ -34,6 +34,11 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # Libraries
 target_link_libraries(${PROJECT_NAME} SDL2 SDL2_image SDL2_mixer SDL2_ttf)
 
+# Linker
+if(${CMAKE_SYSTEM_NAME} STREQUAL Windows)
+    set(LINK_OPTIONS -lmingw32 -mwindows)
+endif()
+
 # Assets
 file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/assets/)
 file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR}/)
