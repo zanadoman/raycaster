@@ -49,6 +49,7 @@ Sint32 main([[maybe_unused]] Sint32 argc, [[maybe_unused]] char* argv[]) {
         PlayerUpdate(&player);
         SDL_Log("%f, %f\n", (double)player.x, (double)player.y);
 
+        RendererRenderFloorAndCeiling(&player);
         RendererRenderSpatialSpace(&player);
         RendererPresentFrame();
         TimerUpdate();

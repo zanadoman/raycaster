@@ -65,19 +65,6 @@ void RendererRenderSpatialSpace(const Player* player) {
     SDL_Rect source;
     SDL_Rect destination;
 
-    if (SDL_SetRenderTarget(RENDERER, SPATIAL_TARGET)) {
-        SDL_Log("%s\n", SDL_GetError());
-        exit(1);
-    }
-    if (SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255)) {
-        SDL_Log("%s\n", SDL_GetError());
-        exit(1);
-    }
-    if (SDL_RenderClear(RENDERER)) {
-        SDL_Log("%s\n", SDL_GetError());
-        exit(1);
-    }
-
     source.y = 0;
     source.w = 1;
     destination.w = 1;
@@ -182,4 +169,91 @@ void RendererPresentFrame(void) {
         exit(1);
     }
     SDL_RenderPresent(RENDERER);
+}
+
+void RendererRenderFloorAndCeiling(const Player* player) {
+    float posX = player->x;
+    float posY = player->y;
+
+    float dirX = SDL_cosf(player->angle);
+    float dirY = SDL_sinf(player->angle);
+
+    float planeX = -dirY * WINDOW_RATIO;
+    float planeY = dirX * WINDOW_RATIO;
+
+    SDL_Texture* const* floorTextures = AssetsGetWallTextures();
+    [[maybe_unused]] SDL_Texture* const* ceilingTextures =
+        AssetsGetWallTextures();
+
+    Sint32 texWidth;
+    Sint32 texHeight;
+    Sint32 y;
+    Sint32 x;
+    if (SDL_QueryTexture(floorTextures[0], NULL, NULL, &texWidth, &texHeight)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(-1);
+    }
+    if (SDL_SetRenderTarget(RENDERER, SPATIAL_TARGET)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_SetRenderDrawColor(RENDERER, 0, 0, 0, 255)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    if (SDL_RenderClear(RENDERER)) {
+        SDL_Log("%s\n", SDL_GetError());
+        exit(1);
+    }
+    for (y = 0; y < WINDOW_HEIGHT; y++) {
+        float rayDirX0 = dirX - planeX;
+        float rayDirY0 = dirY - planeY;
+        float rayDirX1 = dirX + planeX;
+        float rayDirY1 = dirY + planeY;
+
+        Sint32 p = y - (WINDOW_HEIGHT / 2);
+        float posZ = (float)(0.5 * WINDOW_HEIGHT);
+        float rowDistance = posZ / (float)p;
+
+        float floorStepX =
+            rowDistance * (rayDirX1 - rayDirX0) / (float)WINDOW_WIDTH;
+        float floorStepY =
+            rowDistance * (rayDirY1 - rayDirY0) / (float)WINDOW_WIDTH;
+
+        float floorX = posX + (rowDistance * rayDirX0);
+        float floorY = posY + (rowDistance * rayDirY0);
+
+        for (x = 0; x < WINDOW_WIDTH; x++) {
+            SDL_Rect source;
+            SDL_Rect destination;
+
+            Sint32 cellX = (Sint32)(floorX);
+            Sint32 cellY = (Sint32)(floorY);
+
+            Sint32 tx = (Sint32)((float)texWidth * (floorX - (float)cellX)) &
+                        (texWidth - 1);
+            Sint32 ty = (Sint32)((float)texHeight * (floorY - (float)cellY)) &
+                        (texHeight - 1);
+
+            floorX += floorStepX;
+            floorY += floorStepY;
+
+            source.x = tx;
+            source.y = ty;
+            source.w = 1;
+            source.h = 1;
+
+            destination.x = x;
+            destination.y = y;
+            destination.w = 1;
+            destination.h = 1;
+
+            /*SDL_RenderCopy(RENDERER, floorTextures[0], &source,
+             * &destination);*/
+
+            destination.y = WINDOW_HEIGHT - y - 1;
+            /*SDL_RenderCopy(RENDERER, ceilingTextures[0], &source,
+             * &destination);*/
+        }
+    }
 }

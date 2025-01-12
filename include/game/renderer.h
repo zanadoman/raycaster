@@ -15,4 +15,6 @@ void RendererRenderSpatialSpace(const Player* player);
 
 void RendererPresentFrame(void);
 
+void RendererRenderFloorAndCeiling(const Player* player);
+
 #endif
